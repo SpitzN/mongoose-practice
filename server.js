@@ -2,8 +2,8 @@
 Our Setup - 
 Feel free to ignore all of this and skip to the questions at the end
 =======================================================*/
-var bodyParser = require('body-parser')
 var express = require('express')
+var bodyParser = require('body-parser')
 var app = express()
 
 var request = require('request')
@@ -20,46 +20,46 @@ app.use(bodyParser.json())
 /*=====================================================
 Create books Collection
 =======================================================*/
-var isbns = [9780156012195, 9780743273565, 9780435905484, 9780140275360, 9780756404741, 9780756407919, 9780140177398, 9780316769488, 9780062225672, 9780143130154, 9780307455925, 9781501143519]
-var url = "https://www.googleapis.com/books/v1/volumes?q=isbn:"
+// var isbns = [9780156012195, 9780743273565, 9780435905484, 9780140275360, 9780756404741, 9780756407919, 9780140177398, 9780316769488, 9780062225672, 9780143130154, 9780307455925, 9781501143519]
+// var url = "https://www.googleapis.com/books/v1/volumes?q=isbn:"
 
-for (var i = 0; i < isbns.length; i++) {
-  var apiURL = url + isbns[i];
+// for (var i = 0; i < isbns.length; i++) {
+//   var apiURL = url + isbns[i];
   /*=====================================================
   the first time you run your code, uncomment the function below.
   for subsequent runs, re-comment it so that it runs only once!
   that said, there is a fail-safe to avoid duplicates below  
   =======================================================*/
-  loadFromAPI(apiURL)
-}
-console.log("done");
+//   loadFromAPI(apiURL)
+// }
+// console.log("done");
 
-function loadFromAPI(apiURL) {
+// function loadFromAPI(apiURL) {
 
-  request(apiURL, function(error, response, body) {
+//   request(apiURL, function(error, response, body) {
 
-    var result = JSON.parse(body)
+//     var result = JSON.parse(body)
 
-    if (result.totalItems && !error && response.statusCode == 200) {
-      var resBook = JSON.parse(body).items[0].volumeInfo
+//     if (result.totalItems && !error && response.statusCode == 200) {
+//       var resBook = JSON.parse(body).items[0].volumeInfo
 
-      var book = new Book({
-        title: resBook.title,
-        author: resBook.authors[0],
-        pages: resBook.pageCount,
-        genres: resBook.categories || ["Other"],
-        rating: resBook.averageRating || 5
-      })
+//       var book = new Book({
+//         title: resBook.title,
+//         author: resBook.authors[0],
+//         pages: resBook.pageCount,
+//         genres: resBook.categories || ["Other"],
+//         rating: resBook.averageRating || 5
+//       })
 
-      //Only save if the book doesn't exist yet
-      Book.findOne({ title: book.title }, function(err, foundBook) {
-        if (!foundBook) {
-          book.save()
-        }
-      })
-    }
-  })
-}
+//       //Only save if the book doesn't exist yet
+//       Book.findOne({ title: book.title }, function(err, foundBook) {
+//         if (!foundBook) {
+//           book.save()
+//         }
+//       })
+//     }
+//   })
+// }
 
 
 /*=====================================================
@@ -151,19 +151,66 @@ and your server is running do the following:
 ----------------------*/
 //1. Find books with fewer than 500 but more than 200 pages
 
+// Book.find({ $and:[{pages: { $lt: 500 }}, {pages: {$gt:200}}] }, function (err, books) {
+//   // console.log(books)
+// })
+
 //2. Find books whose rating is less than 5, and sort by the author's name
+
+// Book.find({rating: {$lt: 5}}).sort({author: -1}).exec(function (err, books){
+//   console.log(books);
+  
+// })
+
 
 //3. Find all the Fiction books, skip the first 2, and display only 3 of them 
 
+// Book.find({genres: "Fiction"}).skip(2).limit(3).exec(function (err, books){
+//   console.log(books);
+  
+// })
 
 /*People
 ----------------------*/
 //1. Find all the people who are tall (>180) AND rich (>30000)
 
+// Person.find({ $and:[{height: { $gt: 180 }}, {salary: {$gt:30000}}] }, function (err, people) {
+//     // console.log(people)
+//   })
+
 //2. Find all the people who are tall (>180) OR rich (>30000)
+
+// Person.find({ $or:[{height: { $gt: 180 }}, {salary: {$gt:30000}}] }, function (err, people) {
+//   // console.log(people)
+// })
 
 //3. Find all the people who have grey hair or eyes, and are skinny (<70)
 
+// Person.find({
+//   $and: [
+//       { $or: [{eyes: "grey"}, {hair: "grey"}] },
+//       {weight: {$lt: 70}}
+//   ]
+// }, function (err, results) {
+//   console.log(results);
+  
+// })
+
 //4. Find people who have at least 1 kid with grey hair
 
+// Person.find({
+//   $and:[
+//   {numKids: {$gte: 1}}, {"kids.hair": "grey"}]
+// }, function(err, results){
+//   console.log(results);
+// })
+
+
+Person.find({ kids: { $elemMatch: {hair: "grey" }}}).exec(function (err, results){
+  console.log(results);
+
+})
+
 //5. Find all the people who have at least one overweight kid, and are overweight themselves (>100)
+
+
